@@ -1,13 +1,11 @@
-# Stage 1 — build the jar inside Docker (no local Maven needed)
 FROM eclipse-temurin:21-jdk-alpine AS build
 WORKDIR /app
 COPY .mvn/ .mvn/
 COPY mvnw pom.xml ./
-RUN ./mvnw dependency:go-offline -q
+RUN chmod +x mvnw && ./mvnw dependency:go-offline -qgit update-index --chmod=+x mvnw
 COPY src/ src/
 RUN ./mvnw clean package -DskipTests -q
 
-# Stage 2 — lean runtime image
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
